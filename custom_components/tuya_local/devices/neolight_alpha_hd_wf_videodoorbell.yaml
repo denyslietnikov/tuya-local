@@ -1,0 +1,121 @@
+name: Video doorbell
+products:
+  - id: hdaclzs0bi6tevl2
+    manufacturer: NeoLight
+    model: Alpha HD WF
+entities:
+  # This device may return no initial status; DPs arrive asynchronously.
+  - entity: switch
+    translation_key: watermark
+    category: config
+    dps:
+      - id: 104
+        type: boolean
+        optional: true
+        name: switch
+  - entity: sensor
+    class: enum
+    translation_key: sd_status
+    category: diagnostic
+    dps:
+      - id: 110
+        type: integer
+        name: sensor
+        optional: true
+        mapping:
+          - dps_val: 1
+            value: normal
+          - dps_val: 2
+            value: fault
+          - dps_val: 3
+            value: full
+          - dps_val: 4
+            value: formatting
+          - dps_val: 5
+            value: missing
+      - id: 109
+        # Total|used|free in KiB.
+        type: string
+        optional: true
+        name: capacity
+  - entity: event
+    class: motion
+    dps:
+      - id: 115
+        type: base64
+        name: event
+        optional: true
+        persist: false
+        sensitive: true
+        mapping:
+          - dps_val: null
+            value: null
+          - value: detected
+      - id: 115
+        type: base64
+        name: snapshot
+        optional: true
+        sensitive: true
+  - entity: switch
+    translation_key: motion_detection
+    category: config
+    dps:
+      - id: 134
+        type: boolean
+        optional: true
+        name: switch
+  - entity: event
+    class: doorbell
+    dps:
+      - id: 239
+        type: string
+        name: event
+        optional: true
+        persist: false
+        mapping:
+          - dps_val: "Ring"
+            value: ring
+          # Normal and unknown values are not doorbell presses.
+          - value: null
+      - id: 239
+        type: string
+        name: call_info
+        optional: true
+      - id: 154
+        type: base64
+        name: snapshot
+        optional: true
+        sensitive: true
+  # The picture arrives after DP 239 reports Ring.
+  - entity: event
+    name: Doorbell picture
+    dps:
+      - id: 154
+        type: base64
+        name: event
+        optional: true
+        persist: false
+        sensitive: true
+        mapping:
+          - dps_val: null
+            value: null
+          - dps_val: ""
+            value: null
+          - value: triggered
+      - id: 154
+        type: base64
+        name: snapshot
+        optional: true
+        sensitive: true
+  - entity: switch
+    name: Motion detection area
+    category: config
+    dps:
+      - id: 168
+        type: boolean
+        optional: true
+        name: switch
+      - id: 169
+        type: string
+        optional: true
+        name: area
